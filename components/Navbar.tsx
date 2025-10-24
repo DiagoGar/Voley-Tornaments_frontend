@@ -66,7 +66,7 @@ export default function Navbar() {
         {user ? (
           <>
             <span className="text-sm text-gray-300">
-              👋 Hola, {user.username}
+              👋 Hola, {user.name}
             </span>
             <button
               onClick={handleLogout}

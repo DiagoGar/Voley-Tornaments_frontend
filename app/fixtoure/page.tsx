@@ -1,53 +1,86 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSearchParams } from "next/navigation";
 
 export default function GenerarFixture() {
-  const [series, setSeries] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const searchParams = useSearchParams();
+  const tournamentId = searchParams.get("torneo") || ""; // Captura el torneo desde la URL (?torneo=)
 
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [tournaments, setTournaments] = useState<any[]>([]);
+  const [series, setSeries] = useState<any[]>([]);
+
+  const [selectedTournament, setSelectedTournament] = useState('');
   const [selectedSerie, setSelectedSerie] = useState('');
+  const [filteredSeries, setFilteredSeries] = useState<any[]>([]);
 
-  const [filteredSeries, setFilteredSeries] = useState([]);
-
+  // 🔹 Carga torneos y series
   useEffect(() => {
-    fetch('http://localhost:5000/api/series')
-      .then(res => res.json())
-      .then(data => {
-        setSeries(data);
+    const fetchData = async () => {
+      try {
+        const [resT, resS] = await Promise.all([
+          fetch("http://localhost:5000/api/tournaments", { credentials: "include" }),
+          fetch("http://localhost:5000/api/series", { credentials: "include" })
+        ]);
 
-        // Extraer categorías únicas de las series
-        const categoriesMap = new Map();
-        data.forEach((s: any) => {
-          if (s.category) {
-            categoriesMap.set(s.category._id, s.category);
-          }
-        });
-        setCategories(Array.from(categoriesMap.values()));
-      });
+        const dataT = await resT.json();
+        const dataS = await resS.json();
+
+        setTournaments(Array.isArray(dataT) ? dataT : dataT.data || []);
+        setSeries(Array.isArray(dataS) ? dataS : dataS.data || []);
+      } catch (err) {
+        console.error("Error cargando torneos o series:", err);
+      }
+    };
+
+    fetchData();
   }, []);
 
+  // 🔹 Si llega el torneo desde la URL, seleccionarlo automáticamente
+  useEffect(() => {
+    if (tournamentId) {
+      setSelectedTournament(tournamentId);
+    }
+  }, [tournamentId]);
+
+  // 🔹 Filtrar las series según el torneo seleccionado
+  useEffect(() => {
+    if (selectedTournament) {
+      setFilteredSeries(
+        series.filter(
+          (s: any) =>
+            s.tournament === selectedTournament || s.tournament?._id === selectedTournament
+        )
+      );
+    } else {
+      setFilteredSeries([]);
+    }
+  }, [selectedTournament, series]);
+
+  // 🔹 Generar fixture
   const handleGenerate = async () => {
-    if (!selectedCategory || !selectedSerie) {
-      alert('Selecciona una categoría y una serie');
+    if (!selectedTournament || !selectedSerie) {
+      alert('Selecciona un torneo y una serie');
       return;
     }
 
-    const res = await fetch('http://localhost:5000/api/fixture/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        categoryId: selectedCategory,
-        serieId: selectedSerie
-      })
-    });
+    try {
+      const res = await fetch('http://localhost:5000/api/fixture/generate', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ serieId: selectedSerie }),
+      });
 
-    const result = await res.json();
-    if (res.ok) {
-      alert(`Fixture generado: ${result.count} partidos`);
-    } else {
-      alert(result.error);
+      const result = await res.json();
+      if (res.ok) {
+        alert(`✅ Fixture generado con éxito: ${result.count} partidos`);
+      } else {
+        alert(result.error || 'Error al generar fixture');
+      }
+    } catch (error) {
+      console.error("Error generando fixture:", error);
+      alert("Error de conexión al generar fixture");
     }
   };
 
@@ -55,47 +88,53 @@ export default function GenerarFixture() {
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">Generar Fixture</h1>
 
+      {/* Seleccionar Torneo */}
       <select
-        className="border p-2 mb-4 w-full"
-        value={selectedCategory}
+        className="border p-2 mb-4 w-full rounded focus:ring focus:ring-blue-300"
+        value={selectedTournament}
         onChange={e => {
-          const categoryId = e.target.value;
-          setSelectedCategory(categoryId);
+          setSelectedTournament(e.target.value);
           setSelectedSerie('');
-          setFilteredSeries(
-            series.filter((s: any) => s.category?._id === categoryId)
-          );
         }}
       >
-        <option value="">Selecciona una categoría</option>
-        {categories.map((c: any) => (
-          <option key={c._id} value={c._id}>{c.name}</option>
+        <option value="">Selecciona un torneo</option>
+        {tournaments.map((t: any) => (
+          <option className='bg-gray-700' key={t._id} value={t._id}>
+            {t.name}
+          </option>
         ))}
       </select>
 
+      {/* Seleccionar Serie */}
       <select
-        className="border p-2 mb-4 w-full"
+        className="border p-2 mb-4 w-full rounded focus:ring focus:ring-blue-300"
         value={selectedSerie}
         onChange={e => setSelectedSerie(e.target.value)}
-        disabled={!selectedCategory}
+        disabled={!selectedTournament}
       >
         <option value="">Selecciona una serie</option>
         {filteredSeries.map((s: any) => (
-          <option key={s._id} value={s._id}>{s.name}</option>
+          <option className='bg-gray-700' key={s._id} value={s._id}>
+            {s.name}
+          </option>
         ))}
       </select>
 
-      <button
-        onClick={handleGenerate}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        Generar Fixture
-      </button>
-      <button
-        className="bg-blue-500 text-white px-4 py-2 rounded ml-3"
-      >
-        <a href='../partidos'>Ver Partidos</a>
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={handleGenerate}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+        >
+          Generar Fixture
+        </button>
+
+        <a
+          href={`../partidos?torneo=${tournamentId}`}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-center"
+        >
+          Ver Partidos
+        </a>
+      </div>
     </div>
   );
 }

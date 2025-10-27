@@ -24,8 +24,8 @@ export default function RegistrarPartido() {
     try {
       // Si hay un torneo en la URL, filtramos
       const url = torneoId
-        ? `http://localhost:5000/api/matches?tournamentId=${torneoId}`
-        : `http://localhost:5000/api/matches`;
+        ? `${process.env.NEXT_PUBLIC_API_URL}/api/matches?tournamentId=${torneoId}`
+        : `${process.env.NEXT_PUBLIC_API_URL}/api/matches`;
 
       const res = await fetch(url, { credentials: "include" });
       if (!res.ok) throw new Error("Error al cargar los partidos");
@@ -59,7 +59,7 @@ export default function RegistrarPartido() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/matches/${editingMatchId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/matches/${editingMatchId}`,
         {
           method: "PUT",
           credentials: "include",

@@ -15,7 +15,7 @@ export default function TorneoDetallePage() {
   // 🔄 Traer datos del torneo
   const fetchTournament = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/tournaments/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tournaments/${id}`, {
         method: "GET",
         credentials: "include"
       });
@@ -42,7 +42,7 @@ export default function TorneoDetallePage() {
     try {
       setFinalizing(true);
       const res = await fetch(
-        `http://localhost:5000/api/tournaments/${id}/finalize`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/tournaments/${id}/finalize`,
         {
           method: "PUT",
           credentials: "include"

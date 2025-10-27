@@ -20,7 +20,7 @@ export default function Posiciones() {
   // 🔄 Cargar torneos al inicio
   useEffect(() => {
     const fetchTournaments = async () => {
-      const res = await fetch("http://localhost:5000/api/tournaments", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tournaments`, {
         credentials: "include",
       });
       const data = await res.json();
@@ -45,12 +45,12 @@ export default function Posiciones() {
     const fetchData = async () => {
       try {
         const standingsRes = await fetch(
-          `http://localhost:5000/api/standings?tournamentId=${torneoActivo}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/standings?tournamentId=${torneoActivo}`,
           { credentials: "include" }
         );
         const standingsData = await standingsRes.json();
 
-        const seriesRes = await fetch("http://localhost:5000/api/series", {
+        const seriesRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/series`, {
           credentials: "include",
         });
         const seriesData = await seriesRes.json();
@@ -131,7 +131,7 @@ export default function Posiciones() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/matches/next-round/${selectedTournament}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/matches/next-round/${selectedTournament}`,
         { method: "POST" }
       );
 

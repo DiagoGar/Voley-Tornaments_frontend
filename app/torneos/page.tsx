@@ -27,7 +27,7 @@ export default function TorneosPage() {
 
     const fetchTournaments = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/tournaments', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tournaments`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -48,7 +48,7 @@ export default function TorneosPage() {
 
     const fetchCategories = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/categories', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -78,7 +78,7 @@ export default function TorneosPage() {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/tournaments', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tournaments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -93,7 +93,7 @@ export default function TorneosPage() {
         setTournamentName('');
         setTournamentCategory('');
 
-        const updated = await fetch('http://localhost:5000/api/tournaments', {
+        const updated = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tournaments`, {
           credentials: 'include',
         }).then(r => r.json());
 

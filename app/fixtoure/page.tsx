@@ -19,8 +19,8 @@ export default function GenerarFixture() {
     const fetchData = async () => {
       try {
         const [resT, resS] = await Promise.all([
-          fetch("http://localhost:5000/api/tournaments", { credentials: "include" }),
-          fetch("http://localhost:5000/api/series", { credentials: "include" })
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tournaments`, { credentials: "include" }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/series`, { credentials: "include" })
         ]);
 
         const dataT = await resT.json();
@@ -65,7 +65,7 @@ export default function GenerarFixture() {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/fixture/generate', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/fixture/generate`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

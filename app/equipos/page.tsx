@@ -42,17 +42,17 @@ export default function CrearEquipo() {
 
   // Carga inicial (categorías, series y torneos)
   useEffect(() => {
-    fetch("http://localhost:5000/api/categories", { credentials: "include" })
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => setCategories(asArray(data)))
       .catch(() => setCategories([]));
 
-    fetch("http://localhost:5000/api/series", { credentials: "include" })
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/series`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => setSeries(asArray(data)))
       .catch(() => setSeries([]));
 
-    fetch("http://localhost:5000/api/tournaments", { credentials: "include" })
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tournaments`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => setTournaments(asArray(data)))
       .catch(() => setTournaments([]));
@@ -66,7 +66,7 @@ export default function CrearEquipo() {
         return;
       }
       try {
-        const res = await fetch(`http://localhost:5000/api/tournaments/${tournament}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tournaments/${tournament}`, {
           credentials: "include",
         });
         if (!res.ok) throw new Error("No se pudo cargar el torneo");
@@ -96,7 +96,7 @@ export default function CrearEquipo() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/teams", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/teams`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -139,7 +139,7 @@ export default function CrearEquipo() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/series", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/series`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -167,7 +167,7 @@ export default function CrearEquipo() {
       setShowSerieForm(false);
 
       // recargar series y seleccionar la nueva
-      const seriesRes = await fetch("http://localhost:5000/api/series", {
+      const seriesRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/series`, {
         credentials: "include",
       });
       const updatedSeries = asArray(await seriesRes.json());
@@ -192,7 +192,7 @@ export default function CrearEquipo() {
       if (tournament) params.push(`tournamentId=${tournament}`);
       const url = params.length > 0 ? `/api/teams?${params.join("&")}` : "/api/teams";
 
-      const res = await fetch(`http://localhost:5000${url}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
         credentials: "include",
       });
 

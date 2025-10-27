@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from "next/navigation";
 
+export const dynamic = 'force-dynamic'
+
 export default function GenerarFixture() {
   const searchParams = useSearchParams();
   const tournamentId = searchParams.get("torneo") || ""; // Captura el torneo desde la URL (?torneo=)

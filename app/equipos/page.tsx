@@ -19,6 +19,8 @@ const getId = (maybePopulated: any): string | undefined => {
   return undefined;
 };
 
+export const dynamic = 'force-dynamic'
+
 export default function CrearEquipo() {
   const searchParams = useSearchParams();
   const tournamentFromURL = searchParams.get("torneo") || "";

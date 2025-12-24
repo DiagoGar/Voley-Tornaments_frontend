@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function useAuth() {
   const router = useRouter();
@@ -11,18 +11,21 @@ export default function useAuth() {
   useEffect(() => {
     const verifySession = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/auth/verify", {
-          credentials: "include",
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify`,
+          {
+            credentials: 'include',
+          }
+        );
 
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
         } else {
-          router.push("/login");
+          router.push('/login');
         }
       } catch {
-        router.push("/login");
+        router.push('/login');
       } finally {
         setLoading(false);
       }
